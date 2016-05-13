@@ -6,7 +6,7 @@ rm(list=ls(all=TRUE))
 options(java.parameters = "-Xmx8000m")
 
 # id packages
-packages <- c("plyr","dplyr","readxl", "zoo",  "stringi", "ggplot2","tidyr","stringr","xlsx")
+packages <- c("plyr","dplyr","readxl", "zoo",  "stringi", "xlsx","ggplot2","tidyr","stringr","xlsx")
 
 #install and library
 lapply(packages, require, character.only = TRUE)
