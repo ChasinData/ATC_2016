@@ -162,6 +162,7 @@ T2=T2[complete.cases(T2), ]
 T2=select(T2, everything()) %>%
   group_by(MTF,Year,Mon) %>%
   summarise(Acute3rd=mean(Acute3rd))
+colnames(Master)[2:3]<-c("Year","Mon")
 Master<-merge(Master,T2,by=c('MTF','Year','Mon'),all=T)
 
 APLS<-'U:/NRMC/Data Science/ATC TMP/RawData/APLSS/ATC APLSS Data Collection Worksheet as of 8 Apr 2016.xlsx'  
@@ -198,7 +199,7 @@ Master$Demand.Needed.NEW=round((Master$Refine.UR*Master$Enroll),2)
 Master$'MTF_Enc/Demand.Needed' =round(Master$Encounters/Master$Demand.Needed.NEW,2)
 Master$'MTF_Enc/Demand' =round(Master$Encounters/Master$Demand,2)
 Master$'MTF_Enc/Demand.Needed' =round(Master$Encounters/Master$Demand.Needed.NEW,2)
-Master$'Net_Enc/Demand.Needed' =round(Master$Net.Leak.Visits/Master$Demand.Needed,2)
+Master$'Net_Enc/Demand.Needed' =round(Master$Net.Leak.Visits/Master$Demand.Needed.NEW,2)
 Master$'Planned/Demand'=round(Master$Planned/Master$Demand,2)
 write.csv(Master, file.path(out_path,'All Data.csv'), row.names = F)
 Region=Master[Master$MTF %in% scrn , ]
@@ -241,16 +242,20 @@ write.csv(tst,file.path(out_path,'Region file WIDE FIFTY.csv'),row.names=F)
 
 Final=gather(Region,key=Metric,value=Value,-MTF,-Year,-Mon, -Date.ID)
 Final=Final[complete.cases(Final), ]
-Final2=spread(Final, key=Metric, value=Value, fill = NA, convert = FALSE, drop = TRUE)
+write.csv(Final,'Region file LONG.csv',row.names=F)
+#Final<-Final[!duplicated(Final), ]
+Final2=Final[complete.cases(Final), ]
+write.csv(Final2,'Region file LONG with NO NAs.csv',row.names=F)
 
+
+Final$Value=as.numeric(Final$Value)
 Summary=select(Final, everything()) %>%
   group_by(MTF, Metric) %>%
-  summarise(Mean=round(mean(Value),2), Max=round(mean(Value),2), Min=round(min(Value),2),Median=round(median(Value),2))
+  summarise(Mean=round(mean(Value),2), Max=round(max(Value),2), Min=round(min(Value),2),Median=round(median(Value),2))
 write.csv(Summary,file.path(out_path,'Summary by Metric.csv'),row.names=F)
 #######################
 
-write.csv(Final,'Region file LONG.csv',row.names=F)
-Final2=Final[complete.cases(Final), ]
-write.csv(Final2,'Region file LONG with NO NAs.csv',row.names=F)
+
+
 
 
